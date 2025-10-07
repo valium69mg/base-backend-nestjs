@@ -80,4 +80,15 @@ export class UserService {
     return []
   }
 
+  async deleteUserById(userId : string): Promise<boolean> {
+    const result = await AppDataSource.query(`
+        DELETE FROM users WHERE user_id = ?
+      `, [userId]);
+    console.log(result);
+    if (result.affectedRows > 0) {
+      return true;
+    } 
+    throw new HttpException("Could not delete user", HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+
 }
