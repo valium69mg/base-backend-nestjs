@@ -1,6 +1,7 @@
 // src/data-source.ts
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
+import { User } from './users/users.entity';
 dotenv.config()
 
 const port = process.env.DB_PORT;
@@ -16,7 +17,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [],
+  entities: [User],
   //migrations: ['src/migrations/*.ts'],
   synchronize: false,
 });
