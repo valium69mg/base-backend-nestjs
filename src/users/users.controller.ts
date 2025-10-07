@@ -48,7 +48,7 @@ export class UserController {
     @Req() req: Request,
   ): Promise<object> {
     const currentUser = req.user;
-    if (req.user.userId === userId) {
+    if (currentUser.userId === userId) {
       throw new HttpException(
         'You cannot delete your own user',
         HttpStatus.FORBIDDEN,
