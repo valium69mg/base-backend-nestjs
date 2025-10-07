@@ -3,6 +3,7 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { AppDataSource } from 'src/data-source';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import GetUserDTO from './dto/get-user.dto';
 
 const SALT_ROUNDS = 10;
 
@@ -55,5 +56,15 @@ export class UserService {
 
     const hashedPassword = result[0].password;
     return await bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  async getUserById(userId : string): Promise<GetUserDTO> {
+    const result = await AppDataSource.query(`
+        SELECT * FROM users WHERE user_id = ?
+      `,[userId]);
+    if (result.length > 0) {
+      return {userId: result[0].user_id, email: result[0].email};
+    }
+    throw new HttpException("User not found", HttpStatus.NOT_FOUND);
   }
 }
