@@ -2,12 +2,12 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { User } from './users/users.entity';
-dotenv.config()
+dotenv.config();
 
 const port = process.env.DB_PORT;
 
-if (port === undefined) {   
-    throw new Error("Database port is undefined");
+if (port === undefined) {
+  throw new Error('Database port is undefined');
 }
 
 export const AppDataSource = new DataSource({

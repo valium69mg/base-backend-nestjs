@@ -4,13 +4,15 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from './data-source';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,  
+      isGlobal: true,
     }),
-    TypeOrmModule.forRoot(AppDataSource.options)
+    TypeOrmModule.forRoot(AppDataSource.options),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
