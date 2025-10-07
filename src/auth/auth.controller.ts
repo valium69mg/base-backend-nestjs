@@ -11,14 +11,17 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    const validUser = await this.userService.validateUser(
-      body.email,
-      body.password,
-    );
-    if (!validUser) {
+    const user = await this.userService.validateUser(body.email, body.password);
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { username: body.email, sub: 1, roles: ['admin'] };
+
+    const payload = {
+      userId: user.user_id,
+      email: user.email,
+      roles: user.isAdmin ? ['admin'] : ['user'],
+    };
+
     return {
       access_token: this.jwtService.sign(payload),
     };

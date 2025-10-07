@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
-  id: string;
+  user_id: string;
 
   @Column({ name: 'email', type: 'varchar', length: 255 })
   email: string;
@@ -11,8 +11,8 @@ export class User {
   @Column({ name: 'password', type: 'varchar', length: 255 })
   password: number;
 
-  @Column({name : 'isAdmin', type: 'boolean'})
-  isAdmin : boolean;
+  @Column({ name: 'isAdmin', type: 'boolean' })
+  isAdmin: boolean;
 
   @Column({
     name: 'created_at',

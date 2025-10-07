@@ -1,4 +1,4 @@
 export default interface GetUserDTO {
-    userId : string,
-    email : string
+  userId: string;
+  email: string;
 }
