@@ -11,6 +11,9 @@ export class User {
   @Column({ name: 'password', type: 'varchar', length: 255 })
   password: number;
 
+  @Column({name : 'isAdmin', type: 'boolean'})
+  isAdmin : boolean;
+
   @Column({
     name: 'created_at',
     type: 'datetime',
