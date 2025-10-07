@@ -4,11 +4,17 @@ import { UserService } from 'src/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private jwtService: JwtService, private userService: UserService) {}
+  constructor(
+    private jwtService: JwtService,
+    private userService: UserService,
+  ) {}
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    const validUser = await this.userService.validateUser(body.email, body.password);
+    const validUser = await this.userService.validateUser(
+      body.email,
+      body.password,
+    );
     if (!validUser) {
       throw new UnauthorizedException('Invalid credentials');
     }

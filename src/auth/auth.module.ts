@@ -18,7 +18,7 @@ import { UserModule } from 'src/users/users.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule
+    UserModule,
   ],
   controllers: [AuthController],
   providers: [JwtStrategy],
