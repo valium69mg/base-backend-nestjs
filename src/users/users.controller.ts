@@ -22,6 +22,8 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(['admin'])
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() createUserDto: CreateUserDTO): Promise<object> {
     await this.userService.create(createUserDto);
     return { statusCode: 201, message: 'User created succesfully' };
@@ -29,12 +31,14 @@ export class UserController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   async getUsers(): Promise<Array<GetUserDTO>> {
     return await this.userService.getUsers();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
   async getUserById(@Param('id') userId: string): Promise<GetUserDTO> {
     return await this.userService.getUserById(userId);
   }
