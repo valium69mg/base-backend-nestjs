@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { AppDataSource } from 'src/data-source';
 import * as bcrypt from 'bcrypt';
@@ -103,5 +108,18 @@ export class UserService {
       'Could not delete user',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  async getRolesById(userId: string): Promise<Array<string>> {
+    const result = await AppDataSource.query(
+      `
+        SELECT * FROM users WHERE user_id = ?
+      `,
+      [userId],
+    );
+    if (result.length > 0) {
+      return result[0].isAdmin === 1 ? ['admin'] : ['user'];
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 }
