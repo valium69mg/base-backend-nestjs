@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   Param,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
+import type UpdateUserDTO from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -26,6 +28,15 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() createUserDto: CreateUserDTO): Promise<object> {
     await this.userService.create(createUserDto);
+    return { statusCode: 201, message: 'User created succesfully' };
+  }
+
+  @Put()
+  @HttpCode(HttpStatus.ACCEPTED)
+  @Roles(['admin'])
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async update(@Body() updateUserDto: UpdateUserDTO): Promise<object> {
+    await this.userService.update(updateUserDto);
     return { statusCode: 201, message: 'User created succesfully' };
   }
 

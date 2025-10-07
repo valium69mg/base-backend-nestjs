@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import GetUserDTO from './dto/get-user.dto';
 import { User } from './users.entity';
+import UpdateUserDTO from './dto/update-user.dto';
 
 const SALT_ROUNDS = 10;
 
@@ -50,6 +51,20 @@ export class UserService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async update(updateUserDto: UpdateUserDTO): Promise<boolean> {
+    const result = await AppDataSource.query(
+      `
+        UPDATE users SET email = ? WHERE user_id = ?
+      `,
+      [updateUserDto.email, updateUserDto.userId],
+    );
+
+    if (result.affectedRows > 0) {
+      return true;
+    }
+    return false;
   }
 
   async validateUser(
