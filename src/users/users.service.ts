@@ -40,8 +40,8 @@ export class UserService {
       }
       const uuid = uuidv4();
       await AppDataSource.query(
-        `INSERT INTO users (user_id, email, password) VALUES (?, ?, ?)`,
-        [uuid, email, hashedPassword],
+        `INSERT INTO users (user_id, email, password, isAdmin) VALUES (?, ?, ?, ?)`,
+        [uuid, email, hashedPassword, false],
       );
       return true;
     } catch (error) {
