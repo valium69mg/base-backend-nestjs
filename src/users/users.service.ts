@@ -67,4 +67,17 @@ export class UserService {
     }
     throw new HttpException("User not found", HttpStatus.NOT_FOUND);
   }
+
+  async getUsers(): Promise<Array<GetUserDTO>> {
+    const results = await AppDataSource.query(`
+        SELECT * FROM users
+      `);
+    if (results.length > 0) {
+      return results.map(r => {
+        return {userId: r.user_id, email: r.email}
+      });
+    }
+    return []
+  }
+
 }
