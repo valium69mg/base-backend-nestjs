@@ -11,3 +11,9 @@ migrations: ['src/migrations/*.ts'],
 ```bash
 npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run --dataSource src/data-source.ts
 ```
+
+## HOW TO GENERATE A KEY FOR ENCRYPTION
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```

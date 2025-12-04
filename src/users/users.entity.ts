@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { UserSession } from './users_session.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
@@ -20,4 +20,8 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
+
+  @OneToMany(() => UserSession, session => session.user)
+  sessions: UserSession[];
+
 }

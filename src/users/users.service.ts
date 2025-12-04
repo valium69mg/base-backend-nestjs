@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GetUserDTO from './dto/get-user.dto';
 import { User } from './users.entity';
 import UpdateUserDTO from './dto/update-user.dto';
+import { encrypt, decrypt } from 'src/crypto.helper';
 
 const SALT_ROUNDS = 10;
 
@@ -137,4 +138,104 @@ export class UserService {
     }
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
+
+  async getUserRefreshToken(userId: string): Promise<string | null> {
+    const result = await AppDataSource.query(
+      `SELECT user_id, session_id, created_at, refresh_token, iv FROM user_sessions WHERE user_id = ?`,
+      [userId],
+    );
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const validSession = result.find((element: any) => {
+      if (element.created_at) {
+        const createdAtDate = new Date(element.created_at);
+        return createdAtDate >= oneMonthAgo;
+      }
+      return false;
+    });
+
+    return validSession ? decrypt(validSession.refresh_token, validSession.iv) : null;
+  }
+
+  async saveUserRefreshToken(userId: string, newRefreshToken : string) : Promise<void> {
+    const result = await AppDataSource.query(
+          `SELECT user_id, session_id, created_at, refresh_token FROM user_sessions WHERE user_id = ?`,
+          [userId],
+        );
+
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+
+      if (result.length !== 0) {
+          await queryRunner.query(`
+                DELETE FROM user_sessions WHERE user_id = ?
+            `, [userId]);
+      }
+
+      const { encryptedData, iv } = encrypt(newRefreshToken);
+
+      await queryRunner.query(`
+            INSERT INTO user_sessions (session_id, user_id, refresh_token, iv) 
+              VALUES (?, ?, ?, ?)
+        `, [uuidv4().toString(), userId, encryptedData, iv]);
+
+      await queryRunner.commitTransaction();
+    } catch(err) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async isRefreshTokenValid(userId: string, refreshToken: string) : Promise<boolean> {
+        const result = await AppDataSource.query(
+          `SELECT user_id, session_id, created_at, refresh_token, iv FROM user_sessions WHERE user_id = ?`,
+          [userId],
+        );
+
+        if (result.length === 0) {
+          return false;
+        } 
+
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        const validSession = result.find((element: any) => {
+          if (element.created_at) {
+            const createdAtDate = new Date(element.created_at);
+            return createdAtDate >= oneMonthAgo;
+          }
+          return false;
+        });
+
+        
+        if (!validSession) {
+          return false; 
+        }
+
+        const storedRefreshToken = decrypt(validSession.refresh_token, validSession.iv);
+        
+        if (storedRefreshToken === refreshToken) {
+          return true;
+        }
+
+        return false;
+  }
+
+  async deleteRefreshTokens(userId: string) : Promise<void> {
+    await AppDataSource.query(`
+        DELETE FROM user_sessions WHERE user_id = ?
+      `, [userId]);
+  }
+
 }
